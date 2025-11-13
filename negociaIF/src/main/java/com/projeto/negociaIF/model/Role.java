@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Transient;
 
-@MappedSuperclass
-public abstract class Pessoa {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Entity
+@Table(name = "roles")
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +18,4 @@ public abstract class Pessoa {
 
     @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String senha;
 }

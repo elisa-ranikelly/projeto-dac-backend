@@ -8,27 +8,49 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name="usuarios")
-public class Usuario extends Pessoa{
+public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String senha;
 
     @Column(nullable = false)
     private LocalDateTime dataCadastro;
 
     @Column(nullable=false)
-    private String tipo;
-
-    @Column(nullable=false)
     private String telefone;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "usuario_role",
+            joinColumns = @JoinColumn(name = "id_usuario"),
+            inverseJoinColumns = @JoinColumn(name = "id_role")
+    )
+    private Set<Role> roles =  new HashSet<Role>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> itens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario",  cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Interesse> interesses = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){

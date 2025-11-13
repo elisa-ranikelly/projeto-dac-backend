@@ -1,5 +1,7 @@
 package com.projeto.negociaIF.model;
 
+import com.projeto.negociaIF.enuns.StatusAprovacao;
+import com.projeto.negociaIF.enuns.StatusDisponibilidade;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,8 +36,13 @@ public class Item {
     @Column(precision=10, scale=2)
     private BigDecimal preco;
 
-    @Lob
-    private byte[] foto;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    StatusAprovacao  statusAprovacao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    StatusDisponibilidade  statusDisponibilidade;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
@@ -43,13 +52,11 @@ public class Item {
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;
 
-    @ManyToOne
-    @JoinColumn(name = "id_status", nullable = false)
-    private StatusItem statusItem;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private List<FotoItem> fotos = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "id_destaque", nullable = true)
-    private DestaqueItem destaque;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private List<Interesse>  interesses = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){
@@ -57,6 +64,4 @@ public class Item {
             dataCadastro = LocalDateTime.now();
         }
     }
-
-
 }

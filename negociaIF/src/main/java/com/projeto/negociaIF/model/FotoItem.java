@@ -5,24 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Entity
-@Table(name="destaque_item")
-public class DestaqueItem {
+@Table(name="Foto")
+public class FotoItem {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nome;
+    private String url;
 
-    @OneToMany(mappedBy = "destaque")
-    private List<Item> itens = new ArrayList<>();
-
+    @ManyToOne
+    @JoinColumn(name="id_item")
+    private Item item;
 }
