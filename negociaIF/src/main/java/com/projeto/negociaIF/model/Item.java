@@ -1,7 +1,7 @@
 package com.projeto.negociaIF.model;
 
-import com.projeto.negociaIF.enuns.StatusAprovacao;
-import com.projeto.negociaIF.enuns.StatusDisponibilidade;
+import com.projeto.negociaIF.enums.StatusAprovacao;
+import com.projeto.negociaIF.enums.StatusDisponibilidade;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor

@@ -1,4 +1,4 @@
-package com.projeto.negociaIF.enuns;
+package com.projeto.negociaIF.enums;
 
 public enum StatusDisponibilidade {
     VENDIDO,
