@@ -32,7 +32,7 @@ public class Item {
     @Column(nullable = false, length = 500)
     private String descricao;
 
-    @Column(precision=10, scale=2)
+    @Column(nullable = true, precision=10, scale=2)
     private BigDecimal preco;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +42,9 @@ public class Item {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     StatusDisponibilidade  statusDisponibilidade;
+
+    @Column(nullable = true)
+    private String motivoReprovacao;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)

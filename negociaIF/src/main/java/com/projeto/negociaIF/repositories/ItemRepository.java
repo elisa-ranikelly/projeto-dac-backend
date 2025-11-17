@@ -17,4 +17,5 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findByCategoriaAndNomeIgnoreCaseContaining(Categoria categoria, String nomeCategoria);
 
+    List<Item> findByStatusAprovacao(StatusAprovacao statusAprovacao);
 }

@@ -6,15 +6,15 @@ import com.projeto.negociaIF.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface InteresseRepository extends JpaRepository<Interesse,Long> {
 
-    /*Usuario findByUsuario(Usuario usuario);
-
-    Item findByItem(Item item);
-
     boolean existsByUsuarioAndItem(Usuario usuario, Item item);
 
-    Long findByItemUsuario(Long idDono);*/
+    List<Interesse> findByUsuario(Usuario usuario);
+
+    List<Interesse> findByItem(Item item);
 
 }
