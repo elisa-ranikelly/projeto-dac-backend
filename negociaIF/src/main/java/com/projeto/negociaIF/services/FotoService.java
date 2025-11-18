@@ -46,7 +46,7 @@ public class FotoService {
     }
 
     public void excluirFotosPorItem(Long idItem){
-        Item item =   itemService.buscarItemPorId(idItem);
+        Item item =  itemService.buscarItemPorId(idItem);
         List<FotoItem> fotos = fotoRepository.findByItem(item);
 
         if(fotos.isEmpty()){
