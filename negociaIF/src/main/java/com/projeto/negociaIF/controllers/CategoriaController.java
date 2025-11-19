@@ -2,6 +2,7 @@ package com.projeto.negociaIF.controllers;
 
 import com.projeto.negociaIF.dtos.create.CategoriaCreateDTO;
 import com.projeto.negociaIF.dtos.response.CategoriaResponseDTO;
+import com.projeto.negociaIF.dtos.response.ItemResponseDTO;
 import com.projeto.negociaIF.dtos.update.CategoriaUpdateDTO;
 import com.projeto.negociaIF.model.Categoria;
 import com.projeto.negociaIF.services.CategoriaService;
@@ -51,6 +52,15 @@ public class CategoriaController {
         List<CategoriaResponseDTO> lista = categorias.stream().map(cat -> {
             CategoriaResponseDTO categoriaResponseDTO = new CategoriaResponseDTO();
             BeanUtils.copyProperties(cat,categoriaResponseDTO);
+
+            if(cat.getItens() != null){
+                List<ItemResponseDTO> itensDTO = cat.getItens().stream().map(item -> {
+                    ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+                    BeanUtils.copyProperties(item,itemResponseDTO);
+                    return itemResponseDTO;
+                }).toList();
+                categoriaResponseDTO.setItens(itensDTO);
+            }
             return categoriaResponseDTO;
         }).toList();
 

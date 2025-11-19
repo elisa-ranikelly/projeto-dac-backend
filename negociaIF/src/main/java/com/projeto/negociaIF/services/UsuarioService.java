@@ -37,7 +37,6 @@ public class UsuarioService {
     }
 
     public Usuario criarUsuario(Usuario usuario){
-
         validarEmail(usuario.getEmail());
 
         if(usuarioRepository.existsByEmail(usuario.getEmail())){

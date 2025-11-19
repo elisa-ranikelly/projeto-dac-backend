@@ -34,9 +34,9 @@ public class FotoService {
         return fotoRepository.findByItem(item);
     }
 
-    public FotoItem atualizarFoto(Long id, String novaUrl){
+    public FotoItem atualizarFoto(Long id, FotoItem fotoItem){
         FotoItem foto = buscarFotoPorid(id);
-        foto.setUrl(novaUrl);
+        foto.setUrl(fotoItem.getUrl());
         return fotoRepository.save(foto);
     }
 
