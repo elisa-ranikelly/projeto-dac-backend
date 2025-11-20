@@ -8,6 +8,7 @@ import com.projeto.negociaIF.model.Categoria;
 import com.projeto.negociaIF.model.FotoItem;
 import com.projeto.negociaIF.model.Item;
 import com.projeto.negociaIF.model.Usuario;
+import com.projeto.negociaIF.repositories.CategoriaRepository;
 import com.projeto.negociaIF.repositories.FotoRepository;
 import com.projeto.negociaIF.repositories.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class ItemService {
     @Autowired
     private FotoRepository  fotoRepository;
 
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
     public Item buscarItemPorId(Long id){
         return itemRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Item com id " + id + " não encontrado."));
@@ -50,6 +54,11 @@ public class ItemService {
 
         if(item.getFotos() == null || item.getFotos().isEmpty()){
             throw new RegraNegocioObrigacaoException("O item deve conter pelo menos uma foto.");
+        }
+
+        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO ||
+        item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO){
+            throw new RegraNegocioObrigacaoException("Um item recém-criado não pode estar marcado como vendido ou trocado.");
         }
 
         List<FotoItem> fotos = item.getFotos();
@@ -78,11 +87,6 @@ public class ItemService {
     public List<Item> listarItemPorCategoria(Long idCategoria){
         Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
         return itemRepository.findByCategoria(categoria);
-    }
-
-    public List<Item> buscarItemComFiltros(Long idCategoria, String nome){
-        Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
-        return itemRepository.findByCategoriaAndNomeIgnoreCaseContaining(categoria, nome);
     }
 
     public List<Item> listarItensPendentes(){

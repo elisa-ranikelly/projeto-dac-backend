@@ -1,5 +1,6 @@
 package com.projeto.negociaIF.dtos.response;
 
+import com.projeto.negociaIF.enums.StatusAprovacao;
 import com.projeto.negociaIF.enums.StatusDisponibilidade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,11 +13,13 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ItemResponseDTO {
-
+    Long id;
     String nome;
     String descricao;
     BigDecimal preco;
     StatusDisponibilidade statusDisponibilidade;
+    StatusAprovacao statusAprovacao;
+    String motivoReprovacao;
     String categoria;
     List<FotoResponseDTO> fotos;
 }

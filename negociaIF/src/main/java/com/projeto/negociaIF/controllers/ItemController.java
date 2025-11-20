@@ -1,6 +1,7 @@
 package com.projeto.negociaIF.controllers;
 
 import com.projeto.negociaIF.dtos.create.ItemCreateDTO;
+import com.projeto.negociaIF.dtos.create.MotivoReprovacaoCreateDTO;
 import com.projeto.negociaIF.dtos.response.FotoResponseDTO;
 import com.projeto.negociaIF.dtos.response.ItemResponseDTO;
 import com.projeto.negociaIF.dtos.update.ItemUpdateDTO;
@@ -46,7 +47,6 @@ public class ItemController {
         List<FotoItem> fotos = itemCreateDTO.getFotos().stream().map(url -> {
             FotoItem fotoItem = new FotoItem();
             fotoItem.setUrl(url);
-            fotoItem.setItem(item);
             return fotoItem;
         }).toList();
 
@@ -65,7 +65,7 @@ public class ItemController {
     }
 
     @GetMapping("/categoria/{idCategoria}")
-    public ResponseEntity<List<ItemResponseDTO>> listarItemPorIdCategoria(@PathVariable Long idCategoria){
+    public ResponseEntity<List<ItemResponseDTO>> listarItemPorCategoria(@PathVariable Long idCategoria){
         List<Item> itens = itemService.listarItemPorCategoria(idCategoria);
 
         List<ItemResponseDTO> lista = itens.stream().map(item -> {
@@ -74,23 +74,6 @@ public class ItemController {
             itemResponseDTO.setCategoria(item.getCategoria().getNome());
             itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
                     new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
-            return itemResponseDTO;
-        }).toList();
-
-        return ResponseEntity.ok(lista);
-    }
-
-    @GetMapping("/buscar")
-    public ResponseEntity<List<ItemResponseDTO>> buscarItemComFiltros(@RequestParam Long idCategoria, @RequestParam String nome){
-        List<Item> itens =  itemService.buscarItemComFiltros(idCategoria,nome);
-
-        List<ItemResponseDTO> lista = itens.stream().map(item -> {
-            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
-            BeanUtils.copyProperties(item,itemResponseDTO);
-            itemResponseDTO.setCategoria(item.getCategoria().getNome());
-            itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
-                    new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
-
             return itemResponseDTO;
         }).toList();
 
@@ -122,6 +105,11 @@ public class ItemController {
         Item itemSalvo = itemService.atualizarItem(id, itemAtualizado);
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
         BeanUtils.copyProperties(itemSalvo,itemResponseDTO);
+        itemResponseDTO.setCategoria(itemSalvo.getCategoria().getNome());
+        itemResponseDTO.setFotos(itemSalvo.getFotos().stream()
+                .map(foto -> new FotoResponseDTO(foto.getId(), foto.getUrl()))
+                        .toList()
+        );
 
         return ResponseEntity.ok(itemResponseDTO);
     }
@@ -147,11 +135,13 @@ public class ItemController {
     }
 
     @PutMapping("/{id}/reprovar")
-    public ResponseEntity<ItemResponseDTO> reprovarItem(@PathVariable Long id, @RequestParam String motivo){
-        Item item = itemService.reprovarItem(id, motivo);
+    public ResponseEntity<ItemResponseDTO> reprovarItem(@PathVariable Long id, @RequestBody @Valid MotivoReprovacaoCreateDTO  motivoReprovacaoDTO){
+        Item item = itemService.reprovarItem(id, motivoReprovacaoDTO.getMotivoReprovacao());
 
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
         BeanUtils.copyProperties(item,itemResponseDTO);
+        itemResponseDTO.setStatusAprovacao(item.getStatusAprovacao());
+        itemResponseDTO.setMotivoReprovacao(item.getMotivoReprovacao());
         itemResponseDTO.setCategoria(item.getCategoria().getNome());
         itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
                 new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
