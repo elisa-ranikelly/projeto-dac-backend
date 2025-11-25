@@ -5,6 +5,7 @@ import com.projeto.negociaIF.dtos.create.MotivoReprovacaoCreateDTO;
 import com.projeto.negociaIF.dtos.response.FotoResponseDTO;
 import com.projeto.negociaIF.dtos.response.ItemResponseDTO;
 import com.projeto.negociaIF.dtos.update.ItemUpdateDTO;
+import com.projeto.negociaIF.enums.StatusAprovacao;
 import com.projeto.negociaIF.model.FotoItem;
 import com.projeto.negociaIF.model.Item;
 import com.projeto.negociaIF.services.ItemService;
@@ -19,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/itens")
+@RequestMapping("/api/negocia-if/itens")
 public class ItemController {
 
     @Autowired
     private ItemService itemService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-item/{id}")
     public ResponseEntity<ItemResponseDTO> buscarItemPorId(@PathVariable Long id){
         Item item = itemService.buscarItemPorId(id);
 
@@ -39,7 +40,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PostMapping("/{idUsuarioDono}")
+    @PostMapping("/criar-item/{idUsuarioDono}")
     public ResponseEntity<ItemResponseDTO> criarItem(@RequestBody @Valid ItemCreateDTO  itemCreateDTO, @PathVariable Long idUsuarioDono){
         Item item = new Item();
         BeanUtils.copyProperties(itemCreateDTO,item);
@@ -64,7 +65,7 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemResponseDTO);
     }
 
-    @GetMapping("/categoria/{idCategoria}")
+    @GetMapping("/listar-item-categoria/{idCategoria}")
     public ResponseEntity<List<ItemResponseDTO>> listarItemPorCategoria(@PathVariable Long idCategoria){
         List<Item> itens = itemService.listarItemPorCategoria(idCategoria);
 
@@ -80,7 +81,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/pendentes")
+    @GetMapping("/listar-itens-pendentes")
     public ResponseEntity<List<ItemResponseDTO>> listarItensPendentes(){
         List<Item> itens = itemService.listarItensPendentes();
 
@@ -97,12 +98,14 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar-item/{id}")
     public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id, @RequestBody @Valid ItemUpdateDTO itemUpdateDTO){
         Item itemAtualizado = new Item();
         BeanUtils.copyProperties(itemUpdateDTO,itemAtualizado);
 
-        Item itemSalvo = itemService.atualizarItem(id, itemAtualizado);
+        Long idCategoria = itemUpdateDTO.getIdCategoria();
+
+        Item itemSalvo = itemService.atualizarItem(id, itemAtualizado, idCategoria);
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
         BeanUtils.copyProperties(itemSalvo,itemResponseDTO);
         itemResponseDTO.setCategoria(itemSalvo.getCategoria().getNome());
@@ -114,13 +117,13 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/excluir-item/{id}")
     public ResponseEntity<Void> excluirItem(@PathVariable Long id){
         itemService.excluirItem(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/aprovar")
+    @PutMapping("/aprovar-item/{id}")
     public ResponseEntity<ItemResponseDTO> aprovarItem(@PathVariable Long id){
         Item item = itemService.aprovarItem(id);
 
@@ -134,7 +137,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PutMapping("/{id}/reprovar")
+    @PutMapping("/reprovar-item/{id}")
     public ResponseEntity<ItemResponseDTO> reprovarItem(@PathVariable Long id, @RequestBody @Valid MotivoReprovacaoCreateDTO  motivoReprovacaoDTO){
         Item item = itemService.reprovarItem(id, motivoReprovacaoDTO.getMotivoReprovacao());
 
@@ -149,7 +152,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PutMapping("/{id}/vendido")
+    @PutMapping("/item-vendido/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoVendido(@PathVariable Long id){
         Item item = itemService.marcarItemComoVendido(id);
 
@@ -162,7 +165,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PutMapping("/{id}/trocado")
+    @PutMapping("/item-trocado/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoTrocado(@PathVariable Long id){
         Item item = itemService.marcarItemComoTrocado(id);
 

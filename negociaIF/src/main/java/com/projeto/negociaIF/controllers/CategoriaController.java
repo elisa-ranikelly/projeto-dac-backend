@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/categorias")
+@RequestMapping("/api/negocia-if/categorias")
 public class CategoriaController {
 
     @Autowired
     private CategoriaService categoriaService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-categoria/{id}")
     public ResponseEntity<CategoriaResponseDTO> buscarCategoriaPorId(@PathVariable Long id){
         Categoria categoria =  categoriaService.buscarCategoriaPorId(id);
 
@@ -33,7 +33,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaResponseDTO);
     }
 
-    @PostMapping()
+    @PostMapping("/criar-categoria")
     public ResponseEntity<CategoriaResponseDTO> criarCategoria(@RequestBody @Valid CategoriaCreateDTO categoriaDTO){
         Categoria categoria = new Categoria();
         BeanUtils.copyProperties(categoriaDTO,categoria);
@@ -46,7 +46,7 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponseDTO);
     }
 
-    @GetMapping()
+    @GetMapping("/listar-categorias")
     public ResponseEntity<List<CategoriaResponseDTO>> listarCategorias(){
         List<Categoria> categorias = categoriaService.listarCategorias();
 
@@ -75,7 +75,7 @@ public class CategoriaController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar-categoria/{id}")
     public ResponseEntity<CategoriaResponseDTO> atualizarCategoria(@PathVariable Long id, @RequestBody @Valid CategoriaUpdateDTO categoriaDTO){
         Categoria categoriaAtualizada = new Categoria();
         BeanUtils.copyProperties(categoriaDTO,categoriaAtualizada);
@@ -88,7 +88,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/excluir-categoria/{id}")
     public ResponseEntity<Void> excluirCategoria(@PathVariable Long id){
         categoriaService.excluirCategoria(id);
         return ResponseEntity.noContent().build();

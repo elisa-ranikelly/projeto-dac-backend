@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class CategoriaUpdateDTO {
     @NotBlank(message = "O nome é obrigatório.")
     String nome;
+
 }

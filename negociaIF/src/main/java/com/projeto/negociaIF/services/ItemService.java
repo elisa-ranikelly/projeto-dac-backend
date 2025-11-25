@@ -93,7 +93,7 @@ public class ItemService {
         return itemRepository.findByStatusAprovacao(StatusAprovacao.PENDENTE);
     }
 
-    public Item atualizarItem(Long id, Item itemAtualizado){
+    public Item atualizarItem(Long id, Item itemAtualizado, Long idCategoria){
 
         Item itemAtual = buscarItemPorId(id);
 
@@ -108,6 +108,11 @@ public class ItemService {
 
         if(itemAtual.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA && itemAtual.getPreco() == null){
             throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
+        }
+
+        if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO && idCategoria != null){
+            Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
+            itemAtual.setCategoria(categoria);
         }
 
         if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO){
@@ -132,6 +137,10 @@ public class ItemService {
 
     public Item reprovarItem(Long id, String motivo){
         Item item = buscarItemPorId(id);
+
+        if(item.getStatusAprovacao() == StatusAprovacao.APROVADO){
+            throw new RegraNegocioObrigacaoException("O item já foi aprovado e não pode ser reprovado.");
+        }
         item.setMotivoReprovacao(motivo);
         item.setStatusAprovacao(StatusAprovacao.REPROVADO);
         return itemRepository.save(item);
@@ -139,12 +148,22 @@ public class ItemService {
 
     public Item marcarItemComoVendido(Long id){
         Item item = buscarItemPorId(id);
+
+        if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
+            throw new RegraNegocioObrigacaoException("Item pendente ou reprovado não pode ser marcado como vendido.");
+        }
+
         item.setStatusDisponibilidade(StatusDisponibilidade.VENDIDO);
         return itemRepository.save(item);
     }
 
     public Item marcarItemComoTrocado(Long id){
         Item item = buscarItemPorId(id);
+
+        if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
+            throw new RegraNegocioObrigacaoException("Item pendente ou reprovado não pode ser marcado como trocado.");
+        }
+
         item.setStatusDisponibilidade(StatusDisponibilidade.TROCADO);
         return itemRepository.save(item);
     }

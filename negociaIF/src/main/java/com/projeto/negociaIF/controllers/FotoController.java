@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/fotos")
+@RequestMapping("/api/negocia-if/fotos")
 public class FotoController {
 
     @Autowired
     private FotoService fotoService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-foto/{id}")
     public ResponseEntity<FotoResponseDTO> buscarFotoPorId(@PathVariable Long id) {
         FotoItem foto = fotoService.buscarFotoPorid(id);
 
@@ -31,7 +31,7 @@ public class FotoController {
         return ResponseEntity.ok(fotoResponseDTO);
     }
 
-    @PostMapping("/item/{idItem}")
+    @PostMapping("/criar-foto/{idItem}")
     public ResponseEntity<FotoResponseDTO> criarFoto(@PathVariable Long idItem, @RequestBody @Valid FotoCreateDTO fotoCreateDTO) {
         FotoItem foto = new FotoItem();
         BeanUtils.copyProperties(fotoCreateDTO, foto);
@@ -43,7 +43,7 @@ public class FotoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(fotoResponseDTO);
     }
 
-    @GetMapping("/item/{idItem}")
+    @GetMapping("/listar-foto-item/{idItem}")
     public ResponseEntity<List<FotoResponseDTO>> listarFotoPorItem(@PathVariable Long idItem) {
         List<FotoItem> fotos = fotoService.listarFotosPorItem(idItem);
 
@@ -56,7 +56,7 @@ public class FotoController {
         return ResponseEntity.ok(listaFotos);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar-foto/{id}")
     public ResponseEntity<FotoResponseDTO> atualizarFoto(@PathVariable Long id, @RequestBody @Valid FotoUpdateDTO fotoUpdateDTO) {
         FotoItem fotoAtualizada  = new FotoItem();
         BeanUtils.copyProperties(fotoUpdateDTO, fotoAtualizada);
@@ -68,16 +68,11 @@ public class FotoController {
         return ResponseEntity.ok(fotoResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarFotoEspecifica(@PathVariable Long id) {
+    @DeleteMapping("/excluir-foto/{id}")
+    public ResponseEntity<Void> excluirFotoEspecifica(@PathVariable Long id) {
         fotoService.excluirFotoEspecifica(id);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/item/{idItem}")
-    public ResponseEntity<Void> excluirFotosPorItem(@PathVariable Long idItem) {
-        fotoService.excluirFotosPorItem(idItem);
-        return ResponseEntity.noContent().build();
-    }
 
 }

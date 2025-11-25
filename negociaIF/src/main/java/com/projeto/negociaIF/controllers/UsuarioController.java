@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/usuarios")
+@RequestMapping("/api/negocia-if/usuarios")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService  usuarioService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-usuario/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id){
         Usuario usuario = usuarioService.buscarUsuarioPorId(id);
 
@@ -32,7 +32,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioResponseDTO);
     }
 
-    @PostMapping()
+    @PostMapping("/criar-usuario")
     public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody @Valid UsuarioCreateDTO  usuarioCreateDTO){
         Usuario novoUsuario = new Usuario();
         BeanUtils.copyProperties(usuarioCreateDTO, novoUsuario);
@@ -45,7 +45,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDTO);
     }
 
-    @GetMapping()
+    @GetMapping("/listar-usuarios")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios(){
         List<Usuario> usuarios = usuarioService.listarUsuarios();
 
@@ -58,7 +58,7 @@ public class UsuarioController {
         return ResponseEntity.ok(listaUsuarios);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar-usuario/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioUpdateDTO usuarioUpdateDTO){
         Usuario usuarioAtualizado = new Usuario();
         BeanUtils.copyProperties(usuarioUpdateDTO, usuarioAtualizado);
@@ -70,7 +70,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioResponseDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/excluir-usuario/{id}")
     public ResponseEntity<Void> excluirUsuario(@PathVariable Long id){
         usuarioService.deletarUsuario(id);
         return  ResponseEntity.noContent().build();

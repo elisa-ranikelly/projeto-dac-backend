@@ -44,14 +44,4 @@ public class FotoService {
         FotoItem foto = buscarFotoPorid(id);
         fotoRepository.delete(foto);
     }
-
-    public void excluirFotosPorItem(Long idItem){
-        Item item =  itemService.buscarItemPorId(idItem);
-        List<FotoItem> fotos = fotoRepository.findByItem(item);
-
-        if(fotos.isEmpty()){
-            return;
-        }
-        fotoRepository.deleteAll(fotos);
-    }
 }

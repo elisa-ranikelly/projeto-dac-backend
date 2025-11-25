@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/interesses")
+@RequestMapping("/api/negocia-if/interesses")
 public class InteresseController {
 
     @Autowired
     private InteresseService interesseService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-interesse/{id}")
     public ResponseEntity<InteresseResponseDTO> buscarInteressePorId(@PathVariable Long id){
         Interesse interesse = interesseService.buscarInteressePorId(id);
 
@@ -31,7 +31,7 @@ public class InteresseController {
         return ResponseEntity.ok(interesseResponseDTO);
     }
 
-    @PostMapping()
+    @PostMapping("/criar-interesse")
     public ResponseEntity<InteresseResponseDTO> criarInteresse(@Valid @RequestBody InteresseCreateDTO  interesseCreateDTO){
         Interesse interesse = interesseService.criarInteresse(interesseCreateDTO.getIdUsuarioInteressado(), interesseCreateDTO.getIdItem());
 
@@ -44,7 +44,7 @@ public class InteresseController {
         return ResponseEntity.ok(interesseResponseDTO);
     }
 
-    @GetMapping()
+    @GetMapping("/listar-interesses")
     public ResponseEntity<List<InteresseResponseDTO>> listarTodosInteresses(){
         List<Interesse> interesses = interesseService.listarInteresses();
 
@@ -59,8 +59,8 @@ public class InteresseController {
         return ResponseEntity.ok(listaInteresse);
     }
 
-    @GetMapping("/usuario/{idInteressado}")
-    public ResponseEntity<List<InteresseResponseDTO>> listarInteressePorIdUsuario(@PathVariable Long idInteressado){
+    @GetMapping("/listar-interesse-usuario/{idInteressado}")
+    public ResponseEntity<List<InteresseResponseDTO>> listarInteressePorUsuario(@PathVariable Long idInteressado){
         List<Interesse> interesses = interesseService.listarInteressesPorUsuario(idInteressado);
 
         List<InteresseResponseDTO> listaInteresse = interesses.stream().map(interesse -> {
@@ -74,8 +74,8 @@ public class InteresseController {
         return ResponseEntity.ok(listaInteresse);
     }
 
-    @GetMapping("item/{idItem}")
-    public ResponseEntity<List<InteresseResponseDTO>> listarInteressePorIdItem(@PathVariable Long idItem){
+    @GetMapping("/listar-interesses-item/{idItem}")
+    public ResponseEntity<List<InteresseResponseDTO>> listarInteressePorItem(@PathVariable Long idItem){
         List<Interesse> interesses = interesseService.listarInteressesPorItem(idItem);
 
         List<InteresseResponseDTO> listaInteresse = interesses.stream().map(interesse -> {
@@ -89,13 +89,13 @@ public class InteresseController {
         return ResponseEntity.ok(listaInteresse);
     }
 
-    @DeleteMapping("/{id}/usuario/{idUsuario}")
+    @DeleteMapping("/excluir-interesse/{id}/{idUsuario}")
     public ResponseEntity<Void> excluirInteresse(@PathVariable Long id, @PathVariable Long idUsuario){
         interesseService.excluirInteressePorId(id,idUsuario);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/aceitar")
+    @PostMapping("/aceitar-interesse")
     public ResponseEntity<InteresseResponseDTO> aceitarInteresse(@Valid @RequestBody InteresseAcceptDTO interesseAcceptDTO){
         Interesse interesse = interesseService.aceitarInteresse(interesseAcceptDTO.getId(), interesseAcceptDTO.getIdUsuarioDono());
 

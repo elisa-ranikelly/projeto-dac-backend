@@ -24,4 +24,6 @@ public class ItemUpdateDTO {
 
     @NotNull(message = "A disponibilidade do item é obrigatória.")
     StatusDisponibilidade statusDisponibilidade;
+
+    Long idCategoria;
 }

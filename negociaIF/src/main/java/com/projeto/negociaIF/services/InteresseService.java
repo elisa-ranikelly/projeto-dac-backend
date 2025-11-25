@@ -1,5 +1,6 @@
 package com.projeto.negociaIF.services;
 
+import com.projeto.negociaIF.enums.StatusAprovacao;
 import com.projeto.negociaIF.enums.StatusDisponibilidade;
 import com.projeto.negociaIF.exceptions.RecursoNaoEncontradoException;
 import com.projeto.negociaIF.exceptions.RegraNegocioObrigacaoException;
@@ -41,6 +42,15 @@ public class InteresseService {
             throw new RegraNegocioObrigacaoException("Você já demonstrou interesse nesse item.");
         }
 
+        if(item.getStatusAprovacao() != (StatusAprovacao.APROVADO)){
+            throw new RegraNegocioObrigacaoException("O item ainda não foi aprovado, não é possível criar interesses.");
+        }
+
+        if(item.getStatusDisponibilidade() != StatusDisponibilidade.DISPONIVEL_VENDA &&
+        item.getStatusDisponibilidade() != StatusDisponibilidade.DISPONIVEL_TROCA){
+            throw new RegraNegocioObrigacaoException("Não é possível criar interesse. Item não está disponível");
+        }
+
         Interesse interesse = new Interesse();
         interesse.setUsuario(usuario);
         interesse.setItem(item);
@@ -65,8 +75,13 @@ public class InteresseService {
 
     public void excluirInteressePorId(Long id, Long idUsuario){
         Interesse interesse = buscarInteressePorId(id);
+
         if(!interesse.getUsuario().getId().equals(idUsuario)){
             throw new RegraNegocioObrigacaoException("Você não pode excluir interesse de outro usuário.");
+        }
+
+        if(interesse.isAceito()){
+            throw new RegraNegocioObrigacaoException("Você não pode excluir um interesse que foi aceito.");
         }
 
         interesseRepository.delete(interesse);
@@ -81,6 +96,10 @@ public class InteresseService {
             throw new RegraNegocioObrigacaoException("Somente o dono do item pode aceitar o interesse");
         }
 
+        if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
+            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesses de item pendentes.");
+        }
+
         interesse.setAceito(true);
 
         if(item.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_TROCA){
@@ -89,6 +108,10 @@ public class InteresseService {
 
         if(item.getStatusDisponibilidade() ==  StatusDisponibilidade.DISPONIVEL_VENDA){
             itemService.marcarItemComoVendido(item.getId());
+        }
+
+        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO || item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO){
+            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesse, pois o item não está mais disponível.");
         }
 
         return  interesseRepository.save(interesse);
