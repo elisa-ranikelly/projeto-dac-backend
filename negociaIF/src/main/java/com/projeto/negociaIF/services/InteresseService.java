@@ -97,21 +97,21 @@ public class InteresseService {
         }
 
         if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
-            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesses de item pendentes.");
+            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesses em itens pendentes.");
+        }
+
+        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO || item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO){
+            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesse, pois o item não está mais disponível.");
         }
 
         interesse.setAceito(true);
 
         if(item.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_TROCA){
-            itemService.marcarItemComoTrocado(item.getId());
+            item.setStatusDisponibilidade(StatusDisponibilidade.TROCADO);
         }
 
         if(item.getStatusDisponibilidade() ==  StatusDisponibilidade.DISPONIVEL_VENDA){
-            itemService.marcarItemComoVendido(item.getId());
-        }
-
-        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO || item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO && interesse.isAceito()){
-            throw new RegraNegocioObrigacaoException("Não é possível aceitar interesse, pois o item não está mais disponível.");
+            item.setStatusDisponibilidade(StatusDisponibilidade.VENDIDO);
         }
 
         return  interesseRepository.save(interesse);

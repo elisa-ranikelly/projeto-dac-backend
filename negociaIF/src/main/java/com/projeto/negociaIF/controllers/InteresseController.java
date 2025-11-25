@@ -59,7 +59,7 @@ public class InteresseController {
         return ResponseEntity.ok(listaInteresse);
     }
 
-    @GetMapping("/listar-interesse-usuario/{idInteressado}")
+    @GetMapping("/listar-interesses-usuario/{idInteressado}")
     public ResponseEntity<List<InteresseResponseDTO>> listarInteressePorUsuario(@PathVariable Long idInteressado){
         List<Interesse> interesses = interesseService.listarInteressesPorUsuario(idInteressado);
 

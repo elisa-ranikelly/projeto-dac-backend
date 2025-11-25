@@ -151,18 +151,20 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public Item marcarItemComoVendido(Long id){
+    /*public Item marcarItemComoVendido(Long id){
         Item item = buscarItemPorId(id);
 
         if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
             throw new RegraNegocioObrigacaoException("Item pendente ou reprovado não pode ser marcado como vendido.");
         }
 
+
+
         item.setStatusDisponibilidade(StatusDisponibilidade.VENDIDO);
         return itemRepository.save(item);
     }
 
-    public Item marcarItemComoTrocado(Long id){
+    /*public Item marcarItemComoTrocado(Long id){
         Item item = buscarItemPorId(id);
 
         if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
@@ -171,6 +173,6 @@ public class ItemService {
 
         item.setStatusDisponibilidade(StatusDisponibilidade.TROCADO);
         return itemRepository.save(item);
-    }
+    }*/
 
 }

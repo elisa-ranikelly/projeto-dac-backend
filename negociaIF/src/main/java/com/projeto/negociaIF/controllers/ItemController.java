@@ -152,7 +152,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PutMapping("/item-vendido/{id}")
+    /*@PutMapping("/item-vendido/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoVendido(@PathVariable Long id){
         Item item = itemService.marcarItemComoVendido(id);
 
@@ -176,5 +176,5 @@ public class ItemController {
                 new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
 
         return ResponseEntity.ok(itemResponseDTO);
-    }
+    }*/
 }
