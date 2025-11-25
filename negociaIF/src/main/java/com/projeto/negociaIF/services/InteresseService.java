@@ -110,7 +110,7 @@ public class InteresseService {
             itemService.marcarItemComoVendido(item.getId());
         }
 
-        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO || item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO){
+        if(item.getStatusDisponibilidade() == StatusDisponibilidade.VENDIDO || item.getStatusDisponibilidade() == StatusDisponibilidade.TROCADO && interesse.isAceito()){
             throw new RegraNegocioObrigacaoException("Não é possível aceitar interesse, pois o item não está mais disponível.");
         }
 

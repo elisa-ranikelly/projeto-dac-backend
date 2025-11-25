@@ -2,6 +2,7 @@ package com.projeto.negociaIF.services;
 
 import com.projeto.negociaIF.enums.StatusAprovacao;
 import com.projeto.negociaIF.enums.StatusDisponibilidade;
+import com.projeto.negociaIF.exceptions.DuplicateFieldException;
 import com.projeto.negociaIF.exceptions.RecursoNaoEncontradoException;
 import com.projeto.negociaIF.exceptions.RegraNegocioObrigacaoException;
 import com.projeto.negociaIF.model.Categoria;
@@ -43,6 +44,10 @@ public class ItemService {
 
         Usuario usuario = usuarioService.buscarUsuarioPorId(idUsuarioDono);
         Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
+
+        if(itemRepository.existsByNomeIgnoreCaseAndDescricaoIgnoreCaseAndUsuario_IdAndCategoria_Id(item.getNome(), item.getDescricao(), idUsuarioDono, idCategoria)){
+            throw new DuplicateFieldException("Esse item já foi criado. Utilize outro nome e outra descrição.");
+        }
 
         if(item.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA && item.getPreco() == null){
             throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
