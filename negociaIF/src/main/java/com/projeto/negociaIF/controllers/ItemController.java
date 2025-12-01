@@ -81,6 +81,28 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @GetMapping("/buscar-item-por-nome/{idCategoria}")
+    public ResponseEntity<List<ItemResponseDTO>> buscarItemPorNome(@PathVariable Long idCategoria, @RequestParam String nome){
+        List<Item> itens = itemService.buscarPorNomeECategoria(nome, idCategoria);
+
+        List<ItemResponseDTO> lista = itens.stream().map(item -> {
+            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            BeanUtils.copyProperties(item, itemResponseDTO);
+
+            itemResponseDTO.setCategoria(item.getCategoria().getNome());
+
+            itemResponseDTO.setFotos(
+                    item.getFotos().stream()
+                            .map(foto -> new FotoResponseDTO(foto.getId(), foto.getUrl()))
+                            .toList()
+            );
+
+            return itemResponseDTO;
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
     @GetMapping("/listar-itens-pendentes")
     public ResponseEntity<List<ItemResponseDTO>> listarItensPendentes(){
         List<Item> itens = itemService.listarItensPendentes();

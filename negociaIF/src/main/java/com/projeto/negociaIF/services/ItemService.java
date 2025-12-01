@@ -94,6 +94,16 @@ public class ItemService {
         return itemRepository.findByCategoria(categoria);
     }
 
+    public List<Item> buscarPorNomeECategoria(String nome, Long idCategoria) {
+        categoriaService.buscarCategoriaPorId(idCategoria);
+        List<Item> itens = itemRepository.findByNomeContainingIgnoreCaseAndCategoriaId(nome, idCategoria);
+
+        if(itens.isEmpty()){
+            throw new RecursoNaoEncontradoException("Nenhum item foi encontrado com esse nome nessa categoria.");
+        }
+        return itens;
+    }
+
     public List<Item> listarItensPendentes(){
         return itemRepository.findByStatusAprovacao(StatusAprovacao.PENDENTE);
     }

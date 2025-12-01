@@ -15,9 +15,11 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findByCategoria(Categoria categoria);
 
-    List<Item> findByCategoriaAndNomeIgnoreCaseContaining(Categoria categoria, String nomeCategoria);
+    /*List<Item> findByCategoriaAndNomeIgnoreCaseContaining(Categoria categoria, String nomeCategoria);*/
 
     List<Item> findByStatusAprovacao(StatusAprovacao statusAprovacao);
 
     boolean existsByNomeIgnoreCaseAndDescricaoIgnoreCaseAndUsuario_IdAndCategoria_Id(String nome, String descricao, Long idUsuarioDono, Long idCategoria);
+
+    List<Item> findByNomeContainingIgnoreCaseAndCategoriaId(String nome, Long idCategoria);
 }
