@@ -2,6 +2,7 @@ package com.projeto.negociaIF.services;
 
 import com.projeto.negociaIF.exceptions.DuplicateFieldException;
 import com.projeto.negociaIF.exceptions.RecursoNaoEncontradoException;
+import com.projeto.negociaIF.exceptions.RegraNegocioObrigacaoException;
 import com.projeto.negociaIF.model.Role;
 import com.projeto.negociaIF.model.Usuario;
 import com.projeto.negociaIF.repositories.RoleRepository;
@@ -43,8 +44,10 @@ public class UsuarioService {
             throw new DuplicateFieldException("Email já cadastrado.");
         }
 
-        if(usuarioRepository.existsByTelefone(usuario.getTelefone())){
-            throw new DuplicateFieldException("Telefone já cadastrado.");
+        if (usuario.getTelefone() != null && !usuario.getTelefone().isBlank()) {
+            if (usuarioRepository.existsByTelefone(usuario.getTelefone())) {
+                throw new DuplicateFieldException("Telefone já cadastrado.");
+            }
         }
 
         Role role;
@@ -55,6 +58,10 @@ public class UsuarioService {
         }else{
             role = roleRepository.findByNome("USER")
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Role USER não encontrada."));
+
+            if (usuario.getTelefone() == null || usuario.getTelefone().isBlank()) {
+                throw new IllegalArgumentException("Telefone é obrigatório para usuários comuns.");
+            }
         }
 
         Set<Role> roles = new HashSet<>();
@@ -81,9 +88,9 @@ public class UsuarioService {
             usuario.setEmail(usuarioAtualizado.getEmail());
         }
 
-        if(!usuario.getTelefone().equals(usuarioAtualizado.getTelefone())){
+        if(usuarioAtualizado.getTelefone() != null && !usuario.getTelefone().equals(usuarioAtualizado.getTelefone())){
 
-            if(usuarioRepository.existsByTelefone(usuarioAtualizado.getTelefone())){
+            if (usuarioRepository.existsByTelefone(usuario.getTelefone())) {
                 throw new DuplicateFieldException("O telefone já está sendo usado.");
             }
 
@@ -100,6 +107,18 @@ public class UsuarioService {
             throw new RecursoNaoEncontradoException("Usuário com id " + id + " não encontrado.");
         }
         usuarioRepository.deleteById(id);
+    }
+
+    public Usuario autenticar(String email, String senha){
+
+        Usuario usuario = findByEmail(email)
+                .orElseThrow(() -> new RegraNegocioObrigacaoException("Email ou senha inválidos!"));
+
+        if(!usuario.getSenha().equals(senha)){
+            throw new RegraNegocioObrigacaoException("Email ou senha inválidos!");
+        }
+
+        return usuario;
     }
 
     private boolean emailValido(String email){

@@ -19,6 +19,5 @@ public class UsuarioCreateDTO {
     @NotBlank(message = "A senha é obrigatória.")
     String senha;
 
-    @NotBlank(message = "O telefone é obrigatório.")
     String telefone;
 }

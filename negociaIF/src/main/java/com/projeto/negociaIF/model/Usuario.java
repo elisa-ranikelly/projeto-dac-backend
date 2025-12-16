@@ -35,7 +35,7 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDateTime dataCadastro;
 
-    @Column(nullable=false)
+    @Column(nullable=true)
     private String telefone;
 
     @ManyToMany(fetch = FetchType.EAGER)
