@@ -3,6 +3,7 @@ package com.projeto.negociaIF.controllers;
 import com.projeto.negociaIF.dtos.create.UsuarioCreateDTO;
 import com.projeto.negociaIF.dtos.response.UsuarioResponseDTO;
 import com.projeto.negociaIF.dtos.update.UsuarioUpdateDTO;
+import com.projeto.negociaIF.model.Role;
 import com.projeto.negociaIF.model.Usuario;
 import com.projeto.negociaIF.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -27,10 +30,7 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id){
         Usuario usuario = usuarioService.buscarUsuarioPorId(id);
 
-        UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
-        BeanUtils.copyProperties(usuario, usuarioResponseDTO);
-
-        return ResponseEntity.ok(usuarioResponseDTO);
+        return ResponseEntity.ok(usuarioResponseDTO(usuario));
     }
 
     @PostMapping("/criar-usuario")
@@ -40,21 +40,16 @@ public class UsuarioController {
 
         Usuario usuarioSalvo = usuarioService.criarUsuario(novoUsuario);
 
-        UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
-        BeanUtils.copyProperties(usuarioSalvo, usuarioResponseDTO);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDTO(usuarioSalvo));
     }
 
     @GetMapping("/listar-usuarios")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios(){
         List<Usuario> usuarios = usuarioService.listarUsuarios();
 
-        List<UsuarioResponseDTO> listaUsuarios = usuarios.stream().map(usuario -> {
-            UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
-            BeanUtils.copyProperties(usuario, usuarioResponseDTO);
-            return usuarioResponseDTO;
-        }).toList();
+        List<UsuarioResponseDTO> listaUsuarios = usuarios.stream()
+                .map(this::usuarioResponseDTO)
+                .toList();
 
         return ResponseEntity.ok(listaUsuarios);
     }
@@ -65,15 +60,26 @@ public class UsuarioController {
         BeanUtils.copyProperties(usuarioUpdateDTO, usuarioAtualizado);
 
         Usuario usuarioSalvo =  usuarioService.atualizarUsuario(id, usuarioAtualizado);
-        UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
-        BeanUtils.copyProperties(usuarioSalvo, usuarioResponseDTO);
 
-        return ResponseEntity.ok(usuarioResponseDTO);
+        return ResponseEntity.ok(usuarioResponseDTO(usuarioSalvo));
     }
 
     @DeleteMapping("/excluir-usuario/{id}")
     public ResponseEntity<Void> excluirUsuario(@PathVariable Long id){
         usuarioService.deletarUsuario(id);
         return  ResponseEntity.noContent().build();
+    }
+
+    private UsuarioResponseDTO usuarioResponseDTO(Usuario usuario){
+        UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
+        BeanUtils.copyProperties(usuario, usuarioResponseDTO);
+
+        Set<String> roles = usuario.getRoles()
+                .stream()
+                .map(Role::getNome)
+                .collect(Collectors.toSet());
+        usuarioResponseDTO.setRoles(roles);
+
+        return usuarioResponseDTO;
     }
 }

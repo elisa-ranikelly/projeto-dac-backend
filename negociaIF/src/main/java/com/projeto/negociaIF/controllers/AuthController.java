@@ -3,6 +3,7 @@ package com.projeto.negociaIF.controllers;
 import com.projeto.negociaIF.dtos.request.LoginRequestDTO;
 import com.projeto.negociaIF.dtos.response.UsuarioResponseDTO;
 import com.projeto.negociaIF.exceptions.RecursoNaoEncontradoException;
+import com.projeto.negociaIF.model.Role;
 import com.projeto.negociaIF.model.Usuario;
 import com.projeto.negociaIF.repositories.UsuarioRepository;
 import com.projeto.negociaIF.services.UsuarioService;
@@ -11,6 +12,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -27,6 +31,12 @@ public class AuthController {
 
         UsuarioResponseDTO usuarioResponseDTO = new UsuarioResponseDTO();
         BeanUtils.copyProperties(usuario, usuarioResponseDTO);
+
+        Set<String> roles = usuario.getRoles()
+                .stream()
+                .map(Role::getNome)
+                .collect(Collectors.toSet());
+        usuarioResponseDTO.setRoles(roles);
 
         return ResponseEntity.ok(usuarioResponseDTO);
     }
