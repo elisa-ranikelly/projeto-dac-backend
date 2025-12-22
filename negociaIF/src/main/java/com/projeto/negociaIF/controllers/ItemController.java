@@ -13,12 +13,16 @@ import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/negocia-if/itens")
 public class ItemController {
@@ -40,23 +44,15 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    @PostMapping("/criar-item/{idUsuarioDono}")
-    public ResponseEntity<ItemResponseDTO> criarItem(@RequestBody @Valid ItemCreateDTO  itemCreateDTO, @PathVariable Long idUsuarioDono){
+    @PostMapping(value = "/criar-item/{idUsuarioDono}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemResponseDTO> criarItem(@PathVariable Long idUsuarioDono, @RequestPart("item") @Valid ItemCreateDTO  itemCreateDTO, @RequestPart("fotos") List<MultipartFile> fotos) throws IOException {
         Item item = new Item();
         BeanUtils.copyProperties(itemCreateDTO,item);
 
-        List<FotoItem> fotos = itemCreateDTO.getFotos().stream().map(url -> {
-            FotoItem fotoItem = new FotoItem();
-            fotoItem.setUrl(url);
-            return fotoItem;
-        }).toList();
-
-        item.setFotos(fotos);
-
-        Item novoItem = itemService.criarItem(item, idUsuarioDono, itemCreateDTO.getIdCategoria());
+        Item novoItem = itemService.criarItem(item, idUsuarioDono, fotos, itemCreateDTO.getIdCategoria());
 
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
-        BeanUtils.copyProperties(novoItem,itemResponseDTO);
+        BeanUtils.copyProperties(novoItem, itemResponseDTO);
         itemResponseDTO.setCategoria(novoItem.getCategoria().getNome());
         itemResponseDTO.setFotos(novoItem.getFotos().stream().map(foto ->
                 new FotoResponseDTO(foto.getId(), foto.getUrl())).toList()
@@ -120,14 +116,18 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/atualizar-item/{id}")
-    public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id, @RequestBody @Valid ItemUpdateDTO itemUpdateDTO){
-        Item itemAtualizado = new Item();
-        BeanUtils.copyProperties(itemUpdateDTO,itemAtualizado);
+    @PutMapping(value = "/atualizar-item/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id,
+                                                         @RequestPart("item") @Valid ItemUpdateDTO itemUpdateDTO,
+                                                         @RequestPart(value = "novasFotos", required = false) List<MultipartFile> novasFotos,
+                                                         @RequestPart(value = "idsFotosRemovidas", required = false) List<Long> idsFotosRemovidas) throws IOException {
+        Item item = new Item();
+        BeanUtils.copyProperties(itemUpdateDTO,item);
 
-        Long idCategoria = itemUpdateDTO.getIdCategoria();
+       // Long idCategoria = itemUpdateDTO.getIdCategoria();
 
-        Item itemSalvo = itemService.atualizarItem(id, itemAtualizado, idCategoria);
+        Item itemSalvo = itemService.atualizarItem(id, item, novasFotos, idsFotosRemovidas, itemUpdateDTO.getIdCategoria());
+
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
         BeanUtils.copyProperties(itemSalvo,itemResponseDTO);
         itemResponseDTO.setCategoria(itemSalvo.getCategoria().getNome());
@@ -174,7 +174,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
-    /*@PutMapping("/item-vendido/{id}")
+    @PutMapping("/item-vendido/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoVendido(@PathVariable Long id){
         Item item = itemService.marcarItemComoVendido(id);
 
@@ -198,5 +198,5 @@ public class ItemController {
                 new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
 
         return ResponseEntity.ok(itemResponseDTO);
-    }*/
+    }
 }

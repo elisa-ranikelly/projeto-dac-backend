@@ -12,9 +12,13 @@ import com.projeto.negociaIF.model.Usuario;
 import com.projeto.negociaIF.repositories.CategoriaRepository;
 import com.projeto.negociaIF.repositories.FotoRepository;
 import com.projeto.negociaIF.repositories.ItemRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,12 +39,16 @@ public class ItemService {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private FotoService fotoService;
+
     public Item buscarItemPorId(Long id){
         return itemRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Item com id " + id + " não encontrado."));
     }
 
-    public Item criarItem(Item item, Long idUsuarioDono, Long idCategoria){
+    @Transactional
+    public Item criarItem(Item item, Long idUsuarioDono, List<MultipartFile> fotos, Long idCategoria) throws IOException {
 
         Usuario usuario = usuarioService.buscarUsuarioPorId(idUsuarioDono);
         Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
@@ -57,7 +65,7 @@ public class ItemService {
             item.setPreco(null);
         }
 
-        if(item.getFotos() == null || item.getFotos().isEmpty()){
+        if(fotos == null || fotos.isEmpty()){
             throw new RegraNegocioObrigacaoException("O item deve conter pelo menos uma foto.");
         }
 
@@ -66,27 +74,26 @@ public class ItemService {
             throw new RegraNegocioObrigacaoException("Um item recém-criado não pode estar marcado como vendido ou trocado.");
         }
 
-        List<FotoItem> fotos = item.getFotos();
-
         item.setUsuario(usuario);
         item.setCategoria(categoria);
-        item.setFotos(null);
         item.setStatusAprovacao(StatusAprovacao.PENDENTE);
         item.setMotivoReprovacao(null);
 
-        Item novoItem = itemRepository.save(item);
+        List<FotoItem> fotoItems = new ArrayList<>();
 
-        for(FotoItem foto : fotos){
-            if(foto.getUrl() == null || foto.getUrl().isBlank()){
-                throw new RegraNegocioObrigacaoException("A URL da foto não pode ser vazia.");
-            }
+        for (MultipartFile foto : fotos) {
+            String caminho = fotoService.salvarFoto(foto);
 
-            foto.setItem(novoItem);
-            fotoRepository.save(foto);
+            FotoItem fotoItem = new FotoItem();
+            fotoItem.setUrl(caminho);
+            fotoItem.setItem(item);
+
+            fotoItems.add(fotoItem);
         }
 
-        novoItem.setFotos(fotos);
-        return novoItem;
+        item.setFotos(fotoItems);
+
+        return itemRepository.save(item);
     }
 
     public List<Item> listarItemPorCategoria(Long idCategoria){
@@ -108,24 +115,16 @@ public class ItemService {
         return itemRepository.findByStatusAprovacao(StatusAprovacao.PENDENTE);
     }
 
-    public Item atualizarItem(Long id, Item itemAtualizado, Long idCategoria){
+    @Transactional
+    public Item atualizarItem(Long id, Item itemAtualizado, List<MultipartFile> novasFotos, List<Long> idsFotosRemovidas, Long idCategoria) throws IOException{
 
         Item itemAtual = buscarItemPorId(id);
 
-        itemAtual.setNome(itemAtualizado.getNome());
-        itemAtual.setDescricao(itemAtualizado.getDescricao());
-        itemAtual.setStatusDisponibilidade(itemAtualizado.getStatusDisponibilidade());
-        itemAtual.setPreco(itemAtualizado.getPreco());
-
-        if(itemAtual.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_TROCA){
-            itemAtual.setPreco(null);
-        }
-
-        if(itemAtual.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA && itemAtual.getPreco() == null){
-            throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
-        }
-
-        if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO && idCategoria != null){
+        if(itemAtual.getStatusAprovacao() == StatusAprovacao.APROVADO){
+            if(!itemAtual.getCategoria().getId().equals(idCategoria)){
+                throw new RegraNegocioObrigacaoException("Não é permitido alterar a categoria de um item já aprovado!");
+            }
+        }else{
             Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
             itemAtual.setCategoria(categoria);
         }
@@ -133,6 +132,46 @@ public class ItemService {
         if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO){
             itemAtual.setStatusAprovacao(StatusAprovacao.PENDENTE);
             itemAtual.setMotivoReprovacao(null);
+        }
+
+        itemAtual.setNome(itemAtualizado.getNome());
+        itemAtual.setDescricao(itemAtualizado.getDescricao());
+        itemAtual.setStatusDisponibilidade(itemAtualizado.getStatusDisponibilidade());
+
+        if(itemAtualizado.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_TROCA){
+            itemAtual.setPreco(null);
+        }
+
+        if(itemAtualizado.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA && itemAtual.getPreco() == null){
+            throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
+        }
+
+        /*if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO && idCategoria != null){
+            Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
+            itemAtual.setCategoria(categoria);
+        }*/
+
+        itemAtual.setPreco(itemAtualizado.getPreco());
+
+        if(idsFotosRemovidas != null && !idsFotosRemovidas.isEmpty()){
+            itemAtual.getFotos().removeIf(foto -> {
+                if(idsFotosRemovidas.contains(foto.getId())){
+                    fotoRepository.delete(foto);
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        if(novasFotos != null && !novasFotos.isEmpty()){
+            for(MultipartFile foto : novasFotos){
+                String caminho = fotoService.salvarFoto(foto);
+                FotoItem fotoItem = new FotoItem();
+                fotoItem.setUrl(caminho);
+                fotoItem.setItem(itemAtual);
+
+                itemAtual.getFotos().add(fotoItem);
+            }
         }
 
         return itemRepository.save(itemAtual);
@@ -161,20 +200,18 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    /*public Item marcarItemComoVendido(Long id){
+    public Item marcarItemComoVendido(Long id){
         Item item = buscarItemPorId(id);
 
         if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
             throw new RegraNegocioObrigacaoException("Item pendente ou reprovado não pode ser marcado como vendido.");
         }
 
-
-
         item.setStatusDisponibilidade(StatusDisponibilidade.VENDIDO);
         return itemRepository.save(item);
     }
 
-    /*public Item marcarItemComoTrocado(Long id){
+    public Item marcarItemComoTrocado(Long id){
         Item item = buscarItemPorId(id);
 
         if(item.getStatusAprovacao() != StatusAprovacao.APROVADO){
@@ -183,6 +220,6 @@ public class ItemService {
 
         item.setStatusDisponibilidade(StatusDisponibilidade.TROCADO);
         return itemRepository.save(item);
-    }*/
+    }
 
 }
