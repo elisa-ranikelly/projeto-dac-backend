@@ -1,4 +1,4 @@
-package com.projeto.negociaIF.repositories;
+/*package com.projeto.negociaIF.repositories;
 
 import com.projeto.negociaIF.model.Interesse;
 import com.projeto.negociaIF.model.Item;
@@ -17,4 +17,4 @@ public interface InteresseRepository extends JpaRepository<Interesse,Long> {
 
     List<Interesse> findByItem(Item item);
 
-}
+}*/

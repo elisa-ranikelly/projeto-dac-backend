@@ -30,6 +30,6 @@ public class ItemCreateDTO {
     @NotNull(message = "O id da categoria é obrigatório.")
     Long idCategoria;
 
-    @NotEmpty(message = "É obrigatório informar pelo menos uma foto.")
+    //@NotEmpty(message = "É obrigatório informar pelo menos uma foto.")
     List<String> fotos;
 }

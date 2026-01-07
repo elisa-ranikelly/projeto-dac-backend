@@ -1,4 +1,4 @@
-package com.projeto.negociaIF.services;
+/*package com.projeto.negociaIF.services;
 
 import com.projeto.negociaIF.enums.StatusAprovacao;
 import com.projeto.negociaIF.enums.StatusDisponibilidade;
@@ -116,4 +116,4 @@ public class InteresseService {
 
         return  interesseRepository.save(interesse);
     }
-}
+}*/

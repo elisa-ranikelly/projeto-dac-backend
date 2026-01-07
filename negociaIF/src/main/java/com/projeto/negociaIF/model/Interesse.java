@@ -1,4 +1,4 @@
-package com.projeto.negociaIF.model;
+/*package com.projeto.negociaIF.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,4 +26,4 @@ public class Interesse {
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
-}
+}*/

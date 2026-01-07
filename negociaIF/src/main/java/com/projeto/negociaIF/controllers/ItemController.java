@@ -116,6 +116,41 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @GetMapping("/listar-itens-aprovados")
+    public ResponseEntity<List<ItemResponseDTO>> listarItensAprovados(){
+        List<Item> itens = itemService.listarItensAprovados();
+
+        List<ItemResponseDTO> lista = itens.stream().map(item ->  {
+            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            BeanUtils.copyProperties(item,itemResponseDTO);
+            itemResponseDTO.setCategoria(item.getCategoria().getNome());
+            itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
+                    new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
+            return itemResponseDTO;
+
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/listar-itens-reprovados")
+    public ResponseEntity<List<ItemResponseDTO>> listarItensReprovados(){
+        List<Item> itens = itemService.listarItensReprovados();
+
+        List<ItemResponseDTO> lista = itens.stream().map(item ->  {
+            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            BeanUtils.copyProperties(item,itemResponseDTO);
+            itemResponseDTO.setCategoria(item.getCategoria().getNome());
+            itemResponseDTO.setTelefone(item.getUsuario().getTelefone());
+            itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
+                    new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
+            return itemResponseDTO;
+
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
     @PutMapping(value = "/atualizar-item/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id,
                                                          @RequestPart("item") @Valid ItemUpdateDTO itemUpdateDTO,

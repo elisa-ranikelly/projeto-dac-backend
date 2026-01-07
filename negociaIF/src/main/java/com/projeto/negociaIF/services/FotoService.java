@@ -20,7 +20,7 @@ public class FotoService {
     @Autowired
     private FotoRepository fotoRepository;
 
-    private final String pasta = "uploads/itens";
+    private final String pasta = System.getProperty("user.dir") + "/uploads/itens";
 
     public FotoItem buscarFotoPorid(Long id){
         return fotoRepository.findById(id)

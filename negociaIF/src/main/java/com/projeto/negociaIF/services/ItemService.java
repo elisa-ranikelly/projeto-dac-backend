@@ -115,6 +115,14 @@ public class ItemService {
         return itemRepository.findByStatusAprovacao(StatusAprovacao.PENDENTE);
     }
 
+    public List<Item> listarItensAprovados(){
+        return itemRepository.findByStatusAprovacao(StatusAprovacao.APROVADO);
+    }
+
+    public List<Item> listarItensReprovados(){
+        return itemRepository.findByStatusAprovacao(StatusAprovacao.REPROVADO);
+    }
+
     @Transactional
     public Item atualizarItem(Long id, Item itemAtualizado, List<MultipartFile> novasFotos, List<Long> idsFotosRemovidas, Long idCategoria) throws IOException{
 
@@ -221,5 +229,4 @@ public class ItemService {
         item.setStatusDisponibilidade(StatusDisponibilidade.TROCADO);
         return itemRepository.save(item);
     }
-
 }

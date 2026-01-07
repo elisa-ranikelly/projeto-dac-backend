@@ -1,4 +1,4 @@
-package com.projeto.negociaIF.controllers;
+/*package com.projeto.negociaIF.controllers;
 
 import com.projeto.negociaIF.dtos.accept.InteresseAcceptDTO;
 import com.projeto.negociaIF.dtos.create.InteresseCreateDTO;
@@ -106,4 +106,4 @@ public class InteresseController {
 
         return ResponseEntity.ok(interesseResponseDTO);
     }
-}
+}*/

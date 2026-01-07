@@ -21,5 +21,6 @@ public class ItemResponseDTO {
     StatusAprovacao statusAprovacao;
     String motivoReprovacao;
     String categoria;
+    String telefone;
     List<FotoResponseDTO> fotos;
 }
