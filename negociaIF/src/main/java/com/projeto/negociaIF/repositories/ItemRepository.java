@@ -23,4 +23,5 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findByNomeContainingIgnoreCaseAndCategoriaId(String nome, Long idCategoria);
 
+    List<Item> findByUsuario_Id(Long idUsuario);
 }

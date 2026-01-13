@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,18 +124,27 @@ public class ItemService {
         return itemRepository.findByStatusAprovacao(StatusAprovacao.REPROVADO);
     }
 
+    public List<Item> listarMeusItens(Long idUsuario){
+        usuarioService.buscarUsuarioPorId(idUsuario);
+        return itemRepository.findByUsuario_Id(idUsuario);
+    }
+
     @Transactional
-    public Item atualizarItem(Long id, Item itemAtualizado, List<MultipartFile> novasFotos, List<Long> idsFotosRemovidas, Long idCategoria) throws IOException{
+    public Item atualizarItem(Long id, Item itemAtualizado, List<MultipartFile> novasFotos, List<Long> idsFotosRemovidas) throws IOException{
 
         Item itemAtual = buscarItemPorId(id);
 
         if(itemAtual.getStatusAprovacao() == StatusAprovacao.APROVADO){
-            if(!itemAtual.getCategoria().getId().equals(idCategoria)){
-                throw new RegraNegocioObrigacaoException("Não é permitido alterar a categoria de um item já aprovado!");
+            if(itemAtualizado.getCategoria() != null &&
+               !itemAtual.getCategoria().getId().equals(itemAtualizado.getCategoria().getId())){
+                throw new RegraNegocioObrigacaoException(
+                        "Não é permitido alterar a categoria de um item já aprovado!");
             }
         }else{
-            Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
-            itemAtual.setCategoria(categoria);
+            if(itemAtualizado.getCategoria() != null){
+                Categoria categoria = categoriaService.buscarCategoriaPorId(itemAtualizado.getCategoria().getId());
+                itemAtual.setCategoria(categoria);
+            }
         }
 
         if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO){
@@ -150,8 +160,10 @@ public class ItemService {
             itemAtual.setPreco(null);
         }
 
-        if(itemAtualizado.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA && itemAtual.getPreco() == null){
-            throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
+        if(itemAtualizado.getStatusDisponibilidade() == StatusDisponibilidade.DISPONIVEL_VENDA){
+            if(itemAtualizado.getPreco() == null || itemAtualizado.getPreco().compareTo(BigDecimal.ZERO) <= 0){
+                throw new RegraNegocioObrigacaoException("O preço do item para vendas é obrigatório.");
+            }
         }
 
         /*if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO && idCategoria != null){

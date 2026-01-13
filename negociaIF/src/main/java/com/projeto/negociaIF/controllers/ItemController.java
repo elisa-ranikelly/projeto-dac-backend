@@ -6,6 +6,7 @@ import com.projeto.negociaIF.dtos.response.FotoResponseDTO;
 import com.projeto.negociaIF.dtos.response.ItemResponseDTO;
 import com.projeto.negociaIF.dtos.update.ItemUpdateDTO;
 import com.projeto.negociaIF.enums.StatusAprovacao;
+import com.projeto.negociaIF.model.Categoria;
 import com.projeto.negociaIF.model.FotoItem;
 import com.projeto.negociaIF.model.Item;
 import com.projeto.negociaIF.services.ItemService;
@@ -124,6 +125,7 @@ public class ItemController {
             ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
             BeanUtils.copyProperties(item,itemResponseDTO);
             itemResponseDTO.setCategoria(item.getCategoria().getNome());
+            itemResponseDTO.setTelefone(item.getUsuario().getTelefone());
             itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
                     new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
             return itemResponseDTO;
@@ -141,13 +143,32 @@ public class ItemController {
             ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
             BeanUtils.copyProperties(item,itemResponseDTO);
             itemResponseDTO.setCategoria(item.getCategoria().getNome());
-            itemResponseDTO.setTelefone(item.getUsuario().getTelefone());
             itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
                     new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
             return itemResponseDTO;
 
         }).toList();
 
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/listar-meus-itens/{idUsuario}")
+    public ResponseEntity<List<ItemResponseDTO>> listarMeusItens(@PathVariable Long idUsuario){
+        List<Item> itens = itemService.listarMeusItens(idUsuario);
+
+        List<ItemResponseDTO> lista = itens.stream().map(item ->{
+            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            BeanUtils.copyProperties(item,itemResponseDTO);
+
+            itemResponseDTO.setCategoria(item.getCategoria().getNome());
+            itemResponseDTO.setStatusDisponibilidade(item.getStatusDisponibilidade());
+            itemResponseDTO.setStatusAprovacao(item.getStatusAprovacao());
+            itemResponseDTO.setMotivoReprovacao(item.getMotivoReprovacao());
+
+            itemResponseDTO.setFotos(item.getFotos().stream().map(foto ->
+                    new FotoResponseDTO(foto.getId(), foto.getUrl())).toList());
+            return itemResponseDTO;
+        }).toList();
         return ResponseEntity.ok(lista);
     }
 
@@ -161,10 +182,17 @@ public class ItemController {
 
        // Long idCategoria = itemUpdateDTO.getIdCategoria();
 
-        Item itemSalvo = itemService.atualizarItem(id, item, novasFotos, idsFotosRemovidas, itemUpdateDTO.getIdCategoria());
+        if(itemUpdateDTO.getIdCategoria() != null){
+            Categoria categoria = new  Categoria();
+            categoria.setId(itemUpdateDTO.getIdCategoria());
+            item.setCategoria(categoria);
+        }
+
+        Item itemSalvo = itemService.atualizarItem(id, item, novasFotos, idsFotosRemovidas);
 
         ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
         BeanUtils.copyProperties(itemSalvo,itemResponseDTO);
+
         itemResponseDTO.setCategoria(itemSalvo.getCategoria().getNome());
         itemResponseDTO.setFotos(itemSalvo.getFotos().stream()
                 .map(foto -> new FotoResponseDTO(foto.getId(), foto.getUrl()))

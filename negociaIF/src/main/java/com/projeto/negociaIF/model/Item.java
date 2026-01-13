@@ -57,8 +57,8 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<FotoItem> fotos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL,  orphanRemoval = true)
-    private List<Interesse>  interesses = new ArrayList<>();
+    /*@OneToMany(mappedBy = "item", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private List<Interesse>  interesses = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist(){
