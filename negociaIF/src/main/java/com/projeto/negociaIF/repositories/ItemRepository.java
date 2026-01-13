@@ -15,8 +15,6 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findByCategoria(Categoria categoria);
 
-    /*List<Item> findByCategoriaAndNomeIgnoreCaseContaining(Categoria categoria, String nomeCategoria);*/
-
     List<Item> findByStatusAprovacao(StatusAprovacao statusAprovacao);
 
     boolean existsByNomeIgnoreCaseAndDescricaoIgnoreCaseAndUsuario_IdAndCategoria_Id(String nome, String descricao, Long idUsuarioDono, Long idCategoria);
@@ -24,4 +22,16 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     List<Item> findByNomeContainingIgnoreCaseAndCategoriaId(String nome, Long idCategoria);
 
     List<Item> findByUsuario_Id(Long idUsuario);
+
+    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeIn(StatusAprovacao statusAprovacao, List<StatusDisponibilidade> statusDisponibilidade);
+
+    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaId(StatusAprovacao statusAprovacao, List<StatusDisponibilidade> statusDisponibilidade, Long idCategoria);
+
+    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndNomeContainingIgnoreCase(
+            StatusAprovacao status,
+            List<StatusDisponibilidade> disponibilidades,
+            String nome
+    );
+
+
 }

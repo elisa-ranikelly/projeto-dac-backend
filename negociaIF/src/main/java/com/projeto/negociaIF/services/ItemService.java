@@ -129,6 +129,18 @@ public class ItemService {
         return itemRepository.findByUsuario_Id(idUsuario);
     }
 
+    public List<Item> listarItensParaCatalago(){
+        return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeIn(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA,  StatusDisponibilidade.DISPONIVEL_TROCA));
+    }
+
+    public List<Item> listarItensCatalogoPorCategoria(Long idCategoria){
+        return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaId(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA, StatusDisponibilidade.DISPONIVEL_TROCA), idCategoria);
+    }
+
+    public List<Item> buscarItensCatalogoPorNome(String nome){
+        return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeInAndNomeContainingIgnoreCase(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA, StatusDisponibilidade.DISPONIVEL_TROCA), nome);
+    }
+
     @Transactional
     public Item atualizarItem(Long id, Item itemAtualizado, List<MultipartFile> novasFotos, List<Long> idsFotosRemovidas) throws IOException{
 

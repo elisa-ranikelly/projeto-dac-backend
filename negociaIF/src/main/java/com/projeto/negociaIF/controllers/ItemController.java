@@ -172,6 +172,77 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @GetMapping("/catalogo")
+    public ResponseEntity<List<ItemResponseDTO>> listarCatalago(){
+        List<Item> itens = itemService.listarItensParaCatalago();
+
+        List<ItemResponseDTO> lista = itens.stream().map(item -> {
+            ItemResponseDTO response = new ItemResponseDTO();
+            BeanUtils.copyProperties(item, response);
+            response.setCategoria(item.getCategoria().getNome());
+            response.setTelefone(item.getUsuario().getTelefone());
+            response.setFotos(
+                    item.getFotos().stream()
+                            .map(f -> new FotoResponseDTO(f.getId(), f.getUrl()))
+                            .toList()
+            );
+            return response;
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/catalogo/categoria/{idCategoria}")
+    public ResponseEntity<List<ItemResponseDTO>> listarCatalogoPorCategoria(
+            @PathVariable Long idCategoria) {
+
+        List<Item> itens = itemService.listarItensCatalogoPorCategoria(idCategoria);
+
+        List<ItemResponseDTO> lista = itens.stream().map(item -> {
+            ItemResponseDTO response = new ItemResponseDTO();
+            BeanUtils.copyProperties(item, response);
+
+            response.setCategoria(item.getCategoria().getNome());
+            response.setTelefone(item.getUsuario().getTelefone());
+
+            response.setFotos(
+                    item.getFotos().stream()
+                            .map(f -> new FotoResponseDTO(f.getId(), f.getUrl()))
+                            .toList()
+            );
+
+            return response;
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/catalogo/busca")
+    public ResponseEntity<List<ItemResponseDTO>> buscarCatalogoPorNome(
+            @RequestParam String nome) {
+
+        List<Item> itens = itemService.buscarItensCatalogoPorNome(nome);
+
+        List<ItemResponseDTO> lista = itens.stream().map(item -> {
+            ItemResponseDTO response = new ItemResponseDTO();
+            BeanUtils.copyProperties(item, response);
+
+            response.setCategoria(item.getCategoria().getNome());
+            response.setTelefone(item.getUsuario().getTelefone());
+
+            response.setFotos(
+                    item.getFotos().stream()
+                            .map(f -> new FotoResponseDTO(f.getId(), f.getUrl()))
+                            .toList()
+            );
+
+            return response;
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+
     @PutMapping(value = "/atualizar-item/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id,
                                                          @RequestPart("item") @Valid ItemUpdateDTO itemUpdateDTO,
