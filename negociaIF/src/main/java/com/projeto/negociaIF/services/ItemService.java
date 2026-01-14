@@ -137,7 +137,11 @@ public class ItemService {
         return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaId(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA, StatusDisponibilidade.DISPONIVEL_TROCA), idCategoria);
     }
 
-    public List<Item> buscarItensCatalogoPorNome(String nome){
+    public List<Item> listarItensCatalogoPorNomeECategoria(Long idCategoria, String nome) {
+        return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaIdAndNomeContainingIgnoreCase(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA, StatusDisponibilidade.DISPONIVEL_TROCA), idCategoria, nome);
+    }
+
+    public List<Item> listarItensCatalogoPorNome(String nome){
         return itemRepository.findByStatusAprovacaoAndStatusDisponibilidadeInAndNomeContainingIgnoreCase(StatusAprovacao.APROVADO, List.of(StatusDisponibilidade.DISPONIVEL_VENDA, StatusDisponibilidade.DISPONIVEL_TROCA), nome);
     }
 

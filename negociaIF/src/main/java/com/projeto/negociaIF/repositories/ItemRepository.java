@@ -27,11 +27,14 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaId(StatusAprovacao statusAprovacao, List<StatusDisponibilidade> statusDisponibilidade, Long idCategoria);
 
-    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndNomeContainingIgnoreCase(
+    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndCategoriaIdAndNomeContainingIgnoreCase(
             StatusAprovacao status,
             List<StatusDisponibilidade> disponibilidades,
+            Long categoriaId,
             String nome
     );
+
+    List<Item> findByStatusAprovacaoAndStatusDisponibilidadeInAndNomeContainingIgnoreCase(StatusAprovacao statusAprovacao, List<StatusDisponibilidade> statusDisponibilidades, String nome);
 
 
 }

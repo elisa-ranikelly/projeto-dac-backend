@@ -217,11 +217,11 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
-    @GetMapping("/catalogo/busca")
-    public ResponseEntity<List<ItemResponseDTO>> buscarCatalogoPorNome(
-            @RequestParam String nome) {
+    @GetMapping("/catalogo/busca/categoria")
+    public ResponseEntity<List<ItemResponseDTO>> listarCatalogoPorNomeECategoria(
+            @RequestParam Long idCategoria, @RequestParam String nome) {
 
-        List<Item> itens = itemService.buscarItensCatalogoPorNome(nome);
+        List<Item> itens = itemService.listarItensCatalogoPorNomeECategoria(idCategoria, nome);
 
         List<ItemResponseDTO> lista = itens.stream().map(item -> {
             ItemResponseDTO response = new ItemResponseDTO();
@@ -242,6 +242,29 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @GetMapping("/catalogo/busca/nome")
+    public ResponseEntity<List<ItemResponseDTO>> buscarCatalogoPorNome(
+            @RequestParam String nome) {
+
+        List<Item> itens = itemService.listarItensCatalogoPorNome(nome);
+
+        List<ItemResponseDTO> lista = itens.stream().map(item -> {
+            ItemResponseDTO response = new ItemResponseDTO();
+            BeanUtils.copyProperties(item, response);
+
+            response.setCategoria(item.getCategoria().getNome());
+            response.setTelefone(item.getUsuario().getTelefone());
+            response.setFotos(
+                    item.getFotos().stream()
+                            .map(f -> new FotoResponseDTO(f.getId(), f.getUrl()))
+                            .toList()
+            );
+
+            return response;
+        }).toList();
+
+        return ResponseEntity.ok(lista);
+    }
 
     @PutMapping(value = "/atualizar-item/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id,
