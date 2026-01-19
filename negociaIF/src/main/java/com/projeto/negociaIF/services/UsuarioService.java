@@ -37,7 +37,7 @@ public class UsuarioService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário com id " + id + " não encontrado."));
     }
 
-    public Usuario criarUsuario(Usuario usuario){
+    public Usuario criarUsuario(Usuario usuario, String tipoUsuario){
         validarEmail(usuario.getEmail());
 
         if(usuarioRepository.existsByEmail(usuario.getEmail())){
@@ -52,7 +52,7 @@ public class UsuarioService {
 
         Role role;
 
-        if(usuarioRepository.count() == 0){
+        if("ADMIN".equalsIgnoreCase(tipoUsuario)){
             role = roleRepository.findByNome("ADMIN")
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Role ADMIN não encontrado."));
         }else{

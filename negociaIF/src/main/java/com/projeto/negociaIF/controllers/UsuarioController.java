@@ -38,7 +38,7 @@ public class UsuarioController {
         Usuario novoUsuario = new Usuario();
         BeanUtils.copyProperties(usuarioCreateDTO, novoUsuario);
 
-        Usuario usuarioSalvo = usuarioService.criarUsuario(novoUsuario);
+        Usuario usuarioSalvo = usuarioService.criarUsuario(novoUsuario, usuarioCreateDTO.getTipoUsuario());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDTO(usuarioSalvo));
     }

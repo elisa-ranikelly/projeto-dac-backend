@@ -20,4 +20,7 @@ public class UsuarioCreateDTO {
     String senha;
 
     String telefone;
+
+    @NotBlank(message = "O tipo de usuário é obrigatório.")
+    String tipoUsuario;
 }
