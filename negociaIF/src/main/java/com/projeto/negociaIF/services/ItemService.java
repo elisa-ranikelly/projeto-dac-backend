@@ -182,11 +182,6 @@ public class ItemService {
             }
         }
 
-        /*if(itemAtual.getStatusAprovacao() == StatusAprovacao.REPROVADO && idCategoria != null){
-            Categoria categoria = categoriaService.buscarCategoriaPorId(idCategoria);
-            itemAtual.setCategoria(categoria);
-        }*/
-
         itemAtual.setPreco(itemAtualizado.getPreco());
 
         if(idsFotosRemovidas != null && !idsFotosRemovidas.isEmpty()){

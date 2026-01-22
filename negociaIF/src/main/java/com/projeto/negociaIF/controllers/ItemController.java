@@ -274,8 +274,6 @@ public class ItemController {
         Item item = new Item();
         BeanUtils.copyProperties(itemUpdateDTO,item);
 
-       // Long idCategoria = itemUpdateDTO.getIdCategoria();
-
         if(itemUpdateDTO.getIdCategoria() != null){
             Categoria categoria = new  Categoria();
             categoria.setId(itemUpdateDTO.getIdCategoria());

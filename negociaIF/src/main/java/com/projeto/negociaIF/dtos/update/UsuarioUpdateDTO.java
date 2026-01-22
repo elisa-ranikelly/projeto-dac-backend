@@ -16,9 +16,7 @@ public class UsuarioUpdateDTO {
     @NotBlank(message = "O email é obrigatório.")
     String email;
 
-    @NotBlank(message = "A senha é obrigatória.")
     String senha;
-
-    @NotBlank(message = "O telefone é obrigatório.")
+    
     String telefone;
 }

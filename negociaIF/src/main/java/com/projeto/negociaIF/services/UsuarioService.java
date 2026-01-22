@@ -88,9 +88,8 @@ public class UsuarioService {
             usuario.setEmail(usuarioAtualizado.getEmail());
         }
 
-        if(usuarioAtualizado.getTelefone() != null && !usuario.getTelefone().equals(usuarioAtualizado.getTelefone())){
-
-            if (usuarioRepository.existsByTelefone(usuario.getTelefone())) {
+        if(usuarioAtualizado.getTelefone() != null && !usuarioAtualizado.getTelefone().equals(usuario.getTelefone())){
+            if (usuarioRepository.existsByTelefone(usuarioAtualizado.getTelefone())) {
                 throw new DuplicateFieldException("O telefone já está sendo usado.");
             }
 
@@ -98,7 +97,10 @@ public class UsuarioService {
         }
 
         usuario.setNome(usuarioAtualizado.getNome());
-        usuario.setSenha(usuarioAtualizado.getSenha());
+
+        if(usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isBlank()){
+            usuario.setSenha(usuarioAtualizado.getSenha());
+        }
         return usuarioRepository.save(usuario);
     }
 
