@@ -11,13 +11,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/negocia-if/usuarios")
 public class UsuarioController {
@@ -25,6 +25,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService  usuarioService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/buscar-usuario/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id){
         Usuario usuario = usuarioService.buscarUsuarioPorId(id);
@@ -42,6 +43,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseDTO(usuarioSalvo));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/listar-usuarios")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios(){
         List<Usuario> usuarios = usuarioService.listarUsuarios();
@@ -53,6 +55,7 @@ public class UsuarioController {
         return ResponseEntity.ok(listaUsuarios);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping("/atualizar-usuario/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioUpdateDTO usuarioUpdateDTO){
         Usuario usuarioAtualizado = new Usuario();
@@ -63,6 +66,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioResponseDTO(usuarioSalvo));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @DeleteMapping("/excluir-usuario/{id}")
     public ResponseEntity<Void> excluirUsuario(@PathVariable Long id){
         usuarioService.deletarUsuario(id);

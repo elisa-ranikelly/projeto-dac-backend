@@ -16,14 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/negocia-if/itens")
 public class ItemController {
@@ -31,6 +30,7 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/buscar-item/{id}")
     public ResponseEntity<ItemResponseDTO> buscarItemPorId(@PathVariable Long id){
         Item item = itemService.buscarItemPorId(id);
@@ -45,6 +45,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(value = "/criar-item/{idUsuarioDono}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemResponseDTO> criarItem(@PathVariable Long idUsuarioDono, @RequestPart("item") @Valid ItemCreateDTO  itemCreateDTO, @RequestPart("fotos") List<MultipartFile> fotos) throws IOException {
         Item item = new Item();
@@ -62,6 +63,7 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemResponseDTO);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/listar-item-categoria/{idCategoria}")
     public ResponseEntity<List<ItemResponseDTO>> listarItemPorCategoria(@PathVariable Long idCategoria){
         List<Item> itens = itemService.listarItemPorCategoria(idCategoria);
@@ -78,6 +80,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/buscar-item-por-nome/{idCategoria}")
     public ResponseEntity<List<ItemResponseDTO>> buscarItemPorNome(@PathVariable Long idCategoria, @RequestParam String nome){
         List<Item> itens = itemService.buscarPorNomeECategoria(nome, idCategoria);
@@ -100,6 +103,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/listar-itens-pendentes")
     public ResponseEntity<List<ItemResponseDTO>> listarItensPendentes(){
         List<Item> itens = itemService.listarItensPendentes();
@@ -117,6 +121,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/listar-itens-aprovados")
     public ResponseEntity<List<ItemResponseDTO>> listarItensAprovados(){
         List<Item> itens = itemService.listarItensAprovados();
@@ -135,6 +140,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/listar-itens-reprovados")
     public ResponseEntity<List<ItemResponseDTO>> listarItensReprovados(){
         List<Item> itens = itemService.listarItensReprovados();
@@ -152,6 +158,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/listar-meus-itens/{idUsuario}")
     public ResponseEntity<List<ItemResponseDTO>> listarMeusItens(@PathVariable Long idUsuario){
         List<Item> itens = itemService.listarMeusItens(idUsuario);
@@ -172,6 +179,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/catalogo")
     public ResponseEntity<List<ItemResponseDTO>> listarCatalago(){
         List<Item> itens = itemService.listarItensParaCatalago();
@@ -192,6 +200,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/catalogo/categoria/{idCategoria}")
     public ResponseEntity<List<ItemResponseDTO>> listarCatalogoPorCategoria(
             @PathVariable Long idCategoria) {
@@ -217,6 +226,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/catalogo/busca/categoria")
     public ResponseEntity<List<ItemResponseDTO>> listarCatalogoPorNomeECategoria(
             @RequestParam Long idCategoria, @RequestParam String nome) {
@@ -242,6 +252,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/catalogo/busca/nome")
     public ResponseEntity<List<ItemResponseDTO>> buscarCatalogoPorNome(
             @RequestParam String nome) {
@@ -266,6 +277,7 @@ public class ItemController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping(value = "/atualizar-item/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ItemResponseDTO> atualizarItem(@PathVariable Long id,
                                                          @RequestPart("item") @Valid ItemUpdateDTO itemUpdateDTO,
@@ -294,12 +306,14 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/excluir-item/{id}")
     public ResponseEntity<Void> excluirItem(@PathVariable Long id){
         itemService.excluirItem(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/aprovar-item/{id}")
     public ResponseEntity<ItemResponseDTO> aprovarItem(@PathVariable Long id){
         Item item = itemService.aprovarItem(id);
@@ -314,6 +328,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/reprovar-item/{id}")
     public ResponseEntity<ItemResponseDTO> reprovarItem(@PathVariable Long id, @RequestBody @Valid MotivoReprovacaoCreateDTO  motivoReprovacaoDTO){
         Item item = itemService.reprovarItem(id, motivoReprovacaoDTO.getMotivoReprovacao());
@@ -329,6 +344,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/item-vendido/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoVendido(@PathVariable Long id){
         Item item = itemService.marcarItemComoVendido(id);
@@ -342,6 +358,7 @@ public class ItemController {
         return ResponseEntity.ok(itemResponseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/item-trocado/{id}")
     public ResponseEntity<ItemResponseDTO> marcarItemComoTrocado(@PathVariable Long id){
         Item item = itemService.marcarItemComoTrocado(id);

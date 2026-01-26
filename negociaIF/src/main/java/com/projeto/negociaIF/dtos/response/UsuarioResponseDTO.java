@@ -19,4 +19,5 @@ public class UsuarioResponseDTO {
     LocalDateTime dataCadastro;
 
     Set<String> roles;
+    String token;
 }

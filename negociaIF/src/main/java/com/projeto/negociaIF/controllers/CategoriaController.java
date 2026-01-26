@@ -12,11 +12,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/negocia-if/categorias")
 public class CategoriaController {
@@ -24,6 +24,7 @@ public class CategoriaController {
     @Autowired
     private CategoriaService categoriaService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/buscar-categoria/{id}")
     public ResponseEntity<CategoriaResponseDTO> buscarCategoriaPorId(@PathVariable Long id){
         Categoria categoria =  categoriaService.buscarCategoriaPorId(id);
@@ -34,6 +35,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/criar-categoria")
     public ResponseEntity<CategoriaResponseDTO> criarCategoria(@RequestBody @Valid CategoriaCreateDTO categoriaDTO){
         Categoria categoria = new Categoria();
@@ -47,6 +49,7 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponseDTO);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/listar-categorias")
     public ResponseEntity<List<CategoriaResponseDTO>> listarCategorias(){
         List<Categoria> categorias = categoriaService.listarCategorias();
@@ -76,6 +79,7 @@ public class CategoriaController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/atualizar-categoria/{id}")
     public ResponseEntity<CategoriaResponseDTO> atualizarCategoria(@PathVariable Long id, @RequestBody @Valid CategoriaUpdateDTO categoriaDTO){
         Categoria categoriaAtualizada = new Categoria();
@@ -89,6 +93,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/excluir-categoria/{id}")
     public ResponseEntity<Void> excluirCategoria(@PathVariable Long id){
         categoriaService.excluirCategoria(id);

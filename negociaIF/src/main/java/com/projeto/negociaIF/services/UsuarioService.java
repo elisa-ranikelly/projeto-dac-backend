@@ -8,6 +8,7 @@ import com.projeto.negociaIF.model.Usuario;
 import com.projeto.negociaIF.repositories.RoleRepository;
 import com.projeto.negociaIF.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -23,6 +24,9 @@ public class UsuarioService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Optional<Usuario> findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
@@ -50,8 +54,9 @@ public class UsuarioService {
             }
         }
 
-        Role role;
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 
+        Role role;
         if("ADMIN".equalsIgnoreCase(tipoUsuario)){
             role = roleRepository.findByNome("ADMIN")
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Role ADMIN não encontrado."));
@@ -99,7 +104,7 @@ public class UsuarioService {
         usuario.setNome(usuarioAtualizado.getNome());
 
         if(usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isBlank()){
-            usuario.setSenha(usuarioAtualizado.getSenha());
+            usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
         }
         return usuarioRepository.save(usuario);
     }
@@ -111,7 +116,7 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    public Usuario autenticar(String email, String senha){
+    /*public Usuario autenticar(String email, String senha){
 
         Usuario usuario = findByEmail(email)
                 .orElseThrow(() -> new RegraNegocioObrigacaoException("Email ou senha inválidos!"));
@@ -121,7 +126,7 @@ public class UsuarioService {
         }
 
         return usuario;
-    }
+    }*/
 
     private boolean emailValido(String email){
         return email.endsWith("@academico.ifpb.edu.br") || email.endsWith("@ifpb.edu.br");

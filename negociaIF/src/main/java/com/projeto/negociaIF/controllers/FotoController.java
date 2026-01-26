@@ -10,9 +10,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/negocia-if/fotos")
@@ -21,6 +21,7 @@ public class FotoController {
     @Autowired
     private FotoService fotoService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/buscar-foto/{id}")
     public ResponseEntity<FotoResponseDTO> buscarFotoPorId(@PathVariable Long id) {
         FotoItem foto = fotoService.buscarFotoPorid(id);
@@ -31,6 +32,7 @@ public class FotoController {
         return ResponseEntity.ok(fotoResponseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/excluir-foto/{id}")
     public ResponseEntity<Void> excluirFotoEspecifica(@PathVariable Long id) {
         fotoService.excluirFotoEspecifica(id);
